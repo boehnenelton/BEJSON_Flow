@@ -1,0 +1,391 @@
+/* =========================================================
+   BEHTML Experimental Flow — Base Spatial Shell & Workspace
+   Policy 8.1 Tri-Color (#FFFFFF, #000000, #DE2626), 0px Radius
+   ========================================================= */
+
+:root {
+  --be-white: #FFFFFF;
+  --be-black: #000000;
+  --be-red: #DE2626;
+  --be-ry: 32px;
+  --be-ruler: 32px;
+  --be-font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --be-font-mono: 'Roboto Mono', 'Source Code Pro', monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-radius: 0;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--be-white);
+  color: var(--be-black);
+  font-family: var(--be-font-ui);
+  font-size: 13px;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Root Spatial Shell */
+.be-app {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--be-white);
+}
+
+/* =========================================================
+   ROW 0 (Ry = 32px): Windows-Style Top Menu Bar
+   ========================================================= */
+.be-menubar {
+  position: relative;
+  z-index: 100;
+  display: flex;
+  align-items: stretch;
+  height: var(--be-ry);
+  min-height: var(--be-ry);
+  max-height: var(--be-ry);
+  background-color: var(--be-black);
+  color: var(--be-white);
+  border-bottom: 1px solid var(--be-black);
+  overflow: visible;
+}
+
+.be-menubar__item {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.be-menubar__trigger {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 12px;
+  border: 0;
+  background-color: var(--be-black);
+  color: var(--be-white);
+  font-family: var(--be-font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.be-menubar__trigger:hover,
+.be-menubar__item--open .be-menubar__trigger {
+  background-color: var(--be-red);
+  color: var(--be-white);
+}
+
+.be-menubar__dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 196px;
+  background-color: var(--be-white);
+  color: var(--be-black);
+  border: 1px solid var(--be-black);
+  z-index: 200;
+}
+
+.be-menubar__item--open .be-menubar__dropdown {
+  display: flex;
+  flex-direction: column;
+}
+
+.be-menubar__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--be-ry);
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--be-black);
+  background-color: var(--be-white);
+  color: var(--be-black);
+  font-family: var(--be-font-ui);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.be-menubar__option:last-child {
+  border-bottom: 0;
+}
+
+.be-menubar__option:hover {
+  background-color: var(--be-black);
+  color: var(--be-white);
+}
+
+.be-menubar__check {
+  font-family: var(--be-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--be-red);
+}
+
+.be-menubar__option:hover .be-menubar__check {
+  color: var(--be-white);
+}
+
+.be-menubar__status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  font-family: var(--be-font-mono);
+  font-size: 11px;
+  color: var(--be-white);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   ROW 1 & ROW 2 (Ry = 32px each): Dual Horizontal Toolbars
+   ========================================================= */
+.be-toolbar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  height: var(--be-ry);
+  min-height: var(--be-ry);
+  max-height: var(--be-ry);
+  width: 100%;
+  background-color: var(--be-white);
+  color: var(--be-black);
+  border-bottom: 1px solid var(--be-black);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.be-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.be-toolbar__track {
+  display: inline-flex;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  height: 100%;
+  white-space: nowrap;
+}
+
+/* Unselected: square 32x32 icon-only button */
+.be-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 100%;
+  min-width: var(--be-ry);
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--be-black);
+  background-color: var(--be-white);
+  color: var(--be-black);
+  font-family: var(--be-font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.be-tool-btn:hover {
+  background-color: var(--be-black);
+  color: var(--be-white);
+}
+
+.be-tool-btn__icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Label hidden until selected */
+.be-tool-btn__label {
+  display: none;
+}
+
+/* Selected: red background, white icon + visible label */
+.be-tool-btn--active,
+.be-tool-btn--active:hover {
+  padding: 0 10px;
+  background-color: var(--be-red);
+  color: var(--be-white);
+}
+
+.be-tool-btn--active .be-tool-btn__label {
+  display: inline;
+}
+
+/* =========================================================
+   WORKSPACE: X/Y Rulers + White Empty Canvas + Above Layer
+   ========================================================= */
+.be-workspace {
+  position: relative;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: var(--be-ruler) 1fr;
+  grid-template-rows: var(--be-ruler) 1fr;
+  width: 100%;
+  min-height: 0;
+  background-color: var(--be-white);
+  overflow: hidden;
+}
+
+.be-ruler-corner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--be-black);
+  color: var(--be-white);
+  font-family: var(--be-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  border-right: 1px solid var(--be-white);
+  border-bottom: 1px solid var(--be-white);
+}
+
+.be-ruler-x,
+.be-ruler-y {
+  position: relative;
+  background-color: var(--be-black);
+  overflow: hidden;
+}
+
+.be-ruler-x {
+  border-bottom: 1px solid var(--be-black);
+}
+
+.be-ruler-y {
+  border-right: 1px solid var(--be-black);
+}
+
+.be-ruler-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.be-ruler-tracker {
+  position: absolute;
+  background-color: var(--be-red);
+  pointer-events: none;
+  display: none;
+}
+
+.be-ruler-tracker--x {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+}
+
+.be-ruler-tracker--y {
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+/* Canvas Stage (Bottom Base Layer + Above Object Layer) */
+.be-canvas-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--be-white);
+  overflow: hidden;
+  touch-action: none;
+}
+
+.be-canvas-stage--placing {
+  cursor: crosshair;
+}
+
+.be-canvas-stage--selecting {
+  cursor: default;
+}
+
+/* Optional BEHTML base-layer reference grid (off by default) */
+.be-base-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  display: none;
+}
+
+.be-base-grid--visible {
+  display: block;
+}
+
+/* Independent Above Layer for Diagram Objects */
+.be-object-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.be-shape {
+  position: absolute;
+  background-color: var(--be-white);
+  border: 2px solid var(--be-black);
+  cursor: grab;
+  touch-action: none;
+}
+
+.be-shape:active {
+  cursor: grabbing;
+}
+
+.be-shape--selected {
+  border-color: var(--be-red);
+}
+
+/* Center crosshair pip on selected shape */
+.be-shape--selected::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  transform: translate(-50%, -50%);
+  background-color: var(--be-red);
+  pointer-events: none;
+}
+
+/* Live X, Y Measurement Readout */
+.be-coords-hud {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 5;
+  padding: 5px 8px;
+  background-color: var(--be-black);
+  color: var(--be-white);
+  font-family: var(--be-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  white-space: nowrap;
+}

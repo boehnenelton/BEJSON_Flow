@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas Core Framework</title>
+  <link rel="stylesheet" href="css/behtml_base.css">
+  <link rel="stylesheet" href="css/behtml_panels.css">
+</head>
+<body>
+  <div class="be-app" data-be-layout="diagram-shell">
+
+    <!-- ROW 0: File / Edit / View / Tools / Apps Menu Bar (Ry = 32px) -->
+    <nav class="be-menubar" data-be-row="0" aria-label="Main Menu">
+      <div class="be-menubar__item" data-menu="file">
+        <button type="button" class="be-menubar__trigger" aria-haspopup="true" aria-expanded="false">File</button>
+        <div class="be-menubar__dropdown" role="menu">
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="file:new">New Canvas</button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="file:open">Import MFDB-132</button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="file:save">Export MFDB-132</button>
+        </div>
+      </div>
+
+      <div class="be-menubar__item" data-menu="edit">
+        <button type="button" class="be-menubar__trigger" aria-haspopup="true" aria-expanded="false">Edit</button>
+        <div class="be-menubar__dropdown" role="menu">
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="edit:undo">Undo</button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="edit:redo">Redo</button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="edit:delete">Delete Selected</button>
+        </div>
+      </div>
+
+      <div class="be-menubar__item" data-menu="view">
+        <button type="button" class="be-menubar__trigger" aria-haspopup="true" aria-expanded="false">View</button>
+        <div class="be-menubar__dropdown" role="menu">
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="view:grid">
+            <span>Toggle 8-Lane Grid</span>
+            <span class="be-menubar__check" id="be-check-grid"></span>
+          </button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="view:objects">
+            <span>View Objects</span>
+            <span class="be-menubar__check" id="be-check-objects"></span>
+          </button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="view:schema">
+            <span>View Schema</span>
+            <span class="be-menubar__check" id="be-check-schema"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="be-menubar__item" data-menu="tools">
+        <button type="button" class="be-menubar__trigger" aria-haspopup="true" aria-expanded="false">Tools</button>
+        <div class="be-menubar__dropdown" role="menu">
+          <button type="button" class="be-menubar__option" role="menuitem" data-select-tool="selector">Selector</button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-select-tool="shape">Shape</button>
+        </div>
+      </div>
+
+      <div class="be-menubar__item" data-menu="apps">
+        <button type="button" class="be-menubar__trigger" aria-haspopup="true" aria-expanded="false">Apps</button>
+        <div class="be-menubar__dropdown" role="menu">
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="apps:diagram">Diagram</button>
+        </div>
+      </div>
+
+      <div class="be-menubar__status" id="be-menubar-status">NO FILE LOADED</div>
+    </nav>
+
+    <!-- ROW 1: Top Toolbar - maintools (Ry = 32px, Horizontally Scrollable) -->
+    <div class="be-toolbar be-toolbar--maintools" data-be-row="1" role="toolbar" aria-label="Main Tools">
+      <div class="be-toolbar__track" id="be-maintools-track"></div>
+    </div>
+
+    <!-- ROW 2: Bottom Toolbar - selected tool options (Ry = 32px, Horizontally Scrollable) -->
+    <div class="be-toolbar be-toolbar--options" data-be-row="2" role="toolbar" aria-label="Selected Tool Options">
+      <div class="be-toolbar__track" id="be-tooloptions-track"></div>
+    </div>
+
+    <!-- WORKSPACE: Rulers + White Canvas + Above Object Layer + Overlay Panels -->
+    <main class="be-workspace" id="be-workspace" aria-label="Diagram Workspace">
+      <div class="be-ruler-corner" aria-hidden="true">X/Y</div>
+
+      <div class="be-ruler-x" aria-hidden="true">
+        <canvas class="be-ruler-canvas" id="be-ruler-x-canvas"></canvas>
+        <div class="be-ruler-tracker be-ruler-tracker--x" id="be-tracker-x"></div>
+      </div>
+
+      <div class="be-ruler-y" aria-hidden="true">
+        <canvas class="be-ruler-canvas" id="be-ruler-y-canvas"></canvas>
+        <div class="be-ruler-tracker be-ruler-tracker--y" id="be-tracker-y"></div>
+      </div>
+
+      <div class="be-canvas-stage" id="be-canvas-stage">
+        <canvas class="be-base-grid" id="be-base-grid"></canvas>
+        <div class="be-object-layer" id="be-object-layer"></div>
+        <div class="be-coords-hud" id="be-coords-hud">X: 0  Y: 0</div>
+      </div>
+
+      <!-- OVERLAY PANEL: View Objects -->
+      <section class="be-overlay-panel be-overlay-panel--objects be-hidden" id="be-panel-objects" aria-label="Objects Panel">
+        <header class="be-panel__header">
+          <div class="be-panel__title-group">
+            <span class="be-panel__title">Objects</span>
+            <span class="be-panel__badge" id="be-objects-count">0</span>
+          </div>
+          <button type="button" class="be-panel__close" id="be-panel-objects-close" aria-label="Close Objects Panel">×</button>
+        </header>
+        <div class="be-panel__body">
+          <ul class="be-objects-list" id="be-objects-list"></ul>
+          <div class="be-panel__empty" id="be-objects-empty">No objects on canvas.</div>
+        </div>
+        <footer class="be-panel__footer">
+          <span>MFDB ENTITIES</span>
+          <span>1 OBJECT = 1 ENTITY</span>
+        </footer>
+      </section>
+
+      <!-- OVERLAY PANEL: View Schema (Live BEJSON / MFDB-132) -->
+      <section class="be-overlay-panel be-overlay-panel--schema be-hidden" id="be-panel-schema" aria-label="Live Schema Panel">
+        <header class="be-panel__header">
+          <div class="be-panel__title-group">
+            <span class="be-panel__title">Live BEJSON Schema</span>
+          </div>
+          <button type="button" class="be-panel__close" id="be-panel-schema-close" aria-label="Close Schema Panel">×</button>
+        </header>
+        <div class="be-panel__subbar" role="tablist">
+          <button type="button" class="be-panel__tab be-panel__tab--active" role="tab" data-schema-tab="mfdb132">MFDB-132</button>
+          <button type="button" class="be-panel__tab" role="tab" data-schema-tab="manifest">Manifest 104a</button>
+          <button type="button" class="be-panel__tab" role="tab" data-schema-tab="positions">Position Map</button>
+        </div>
+        <div class="be-panel__body">
+          <pre class="be-schema-pre" id="be-schema-pre"></pre>
+        </div>
+        <footer class="be-panel__footer">
+          <span class="be-schema-valid" id="be-schema-valid">VALID MFDB-132</span>
+          <div class="be-panel__actions">
+            <button type="button" class="be-btn-mini" id="be-schema-copy">Copy</button>
+            <button type="button" class="be-btn-mini be-btn-mini--accent" id="be-schema-export">Export</button>
+          </div>
+        </footer>
+      </section>
+    </main>
+
+  </div>
+
+  <!-- STARTUP FILE GATE MODAL (Forces Create New or Import MFDB-132 File) -->
+  <div class="be-startup-gate" id="be-startup-gate" role="dialog" aria-modal="true" aria-labelledby="be-startup-title">
+    <div class="be-startup-card">
+      <header class="be-startup-card__header">
+        <span id="be-startup-title">Canvas Core Framework</span>
+        <span class="be-startup-card__tag">MFDB-132</span>
+      </header>
+
+      <div class="be-startup-card__section">
+        <h2 class="be-startup-card__heading">Create New File</h2>
+        <p class="be-startup-card__desc">Initialize a new MFDB-132 canvas session. Each placed object is tracked as its own BEJSON 104 MFDB entity.</p>
+        <div class="be-startup-form-row">
+          <input type="text" class="be-input" id="be-startup-dbname" value="untitled_canvas" placeholder="project_name" aria-label="Database Name">
+          <button type="button" class="be-btn-primary" id="be-startup-create">Create New</button>
+        </div>
+      </div>
+
+      <div class="be-startup-card__section">
+        <h2 class="be-startup-card__heading">Import MFDB-132 File</h2>
+        <p class="be-startup-card__desc">Load an existing single-file <code>.mfdb132.bejson</code> package to restore all MFDB entities and object positions.</p>
+        <div class="be-startup-form-row">
+          <button type="button" class="be-btn-secondary" id="be-startup-import">Import .mfdb132.bejson</button>
+          <button type="button" class="be-btn-secondary be-hidden" id="be-startup-cancel">Cancel</button>
+        </div>
+        <div class="be-startup-error be-hidden" id="be-startup-error" role="alert"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden file input for MFDB-132 single-file import -->
+  <input type="file" id="be-mfdb-file-input" class="be-hidden" accept=".bejson,.json">
+
+  <!-- =========================================================
+       IMPORTED CORE JS LIBRARIES (libraries_105/Lib_JS/Core)
+       ========================================================= -->
+  <script src="lib/core/lib_bejson_Core_bejson_errors.js"></script>
+  <script src="lib/core/lib_bejson_Core_bejson_parse.js"></script>
+  <script src="lib/core/lib_bejson_Core_bejson_schema.js"></script>
+  <script src="lib/core/lib_bejson_Core_bejson_secure_zip.js"></script>
+  <script src="lib/core/lib_bejson_Core_bejson_state.js"></script>
+  <script src="lib/core/lib_bejson_Core_bejson_validator.js"></script>
+  <script src="lib/core/lib_bejson_Core_bejson_core.js"></script>
+  <script src="lib/core/lib_bejson_Core_bejson_core_nesting.js"></script>
+  <script src="lib/core/lib_bejson_Core_bejson_bejson.js"></script>
+  <script src="lib/core/lib_bejson_Core_mfdb_validator.js"></script>
+  <script src="lib/core/lib_bejson_Core_mfdb_core.js"></script>
+  <script src="lib/core/lib_bejson_Core_bejson_chunking.js"></script>
+
+  <!-- NEW CANVAS CORE BACKEND LIBRARY -->
+  <script src="lib/lib_bejson_canvas_core.js"></script>
+
+  <!-- SEPARATED FRONTEND UI MODULES -->
+  <script src="js/app_tools.js"></script>
+  <script src="js/app_rulers.js"></script>
+  <script src="js/app_canvas.js"></script>
+  <script src="js/app_panels.js"></script>
+  <script src="js/app_main.js"></script>
+</body>
+</html>
