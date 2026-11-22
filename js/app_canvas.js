@@ -139,6 +139,53 @@
 
         connectorLayer.appendChild(g);
       });
+
+      // Render Redirection Gate side anchor stubs that go nowhere until a node is added
+      const sideAnchors = (store.getRedirectSideAnchors && typeof store.getRedirectSideAnchors === 'function')
+        ? store.getRedirectSideAnchors()
+        : [];
+
+      sideAnchors.forEach(function (sa) {
+        const sg = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        sg.setAttribute('class', 'be-redirect-stub-group');
+
+        // Dashed stub branch line extending from gate right side out to anchor dot
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', sa.startX);
+        line.setAttribute('y1', sa.startY);
+        line.setAttribute('x2', sa.cx);
+        line.setAttribute('y2', sa.cy);
+        line.setAttribute('class', 'be-connector-line be-connector-line--redirect-stub');
+        sg.appendChild(line);
+
+        // Branch indicator label "ALT"
+        const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        txt.setAttribute('x', Math.round((sa.startX + sa.cx) / 2));
+        txt.setAttribute('y', sa.startY - 6);
+        txt.setAttribute('class', 'be-redirect-stub-label');
+        txt.textContent = 'ALT';
+        sg.appendChild(txt);
+
+        // Side Anchor Dot (distinct red dot with white border)
+        const sdot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        sdot.setAttribute('cx', sa.cx);
+        sdot.setAttribute('cy', sa.cy);
+        sdot.setAttribute('r', sa.radius || 6);
+        sdot.setAttribute('class', 'be-anchor-dot be-anchor-dot--redirect-branch');
+        sdot.dataset.redirectNodeId = String(sa.redirectNodeId);
+
+        // Hit circle for click tolerance
+        const shit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        shit.setAttribute('cx', sa.cx);
+        shit.setAttribute('cy', sa.cy);
+        shit.setAttribute('r', '16');
+        shit.setAttribute('class', 'be-anchor-hit be-anchor-hit--redirect-branch');
+        shit.dataset.redirectNodeId = String(sa.redirectNodeId);
+
+        sg.appendChild(sdot);
+        sg.appendChild(shit);
+        connectorLayer.appendChild(sg);
+      });
     }
 
     function renderShapes() {
@@ -258,10 +305,18 @@
       const x = coords.x;
       const y = coords.y;
 
-      // Click on anchor dot (midpoint or loopback anchor point) to insert component
+      // Click on anchor dot (midpoint, loopback anchor point, or redirect side branch anchor) to insert component
       const anchorHit = e.target.closest('.be-anchor-hit') || e.target.closest('.be-anchor-dot');
       if (anchorHit) {
         e.stopPropagation();
+        if (anchorHit.dataset.redirectNodeId) {
+          const redirectNodeId = Number(anchorHit.dataset.redirectNodeId);
+          if (panels && typeof panels.openInsertNodePanelForBranch === 'function') {
+            panels.openInsertNodePanelForBranch(redirectNodeId);
+          }
+          return;
+        }
+
         const connectorId = Number(anchorHit.dataset.connectorId);
         const anchorIndex = anchorHit.dataset.anchorIndex !== undefined
           ? Number(anchorHit.dataset.anchorIndex)

@@ -148,12 +148,12 @@
       <section class="be-overlay-panel be-overlay-panel--insert-node be-hidden" id="be-panel-insert-node" aria-label="Insert Component">
         <header class="be-panel__header">
           <div class="be-panel__title-group">
-            <span class="be-panel__title">Insert Component</span>
+            <span class="be-panel__title" id="be-insert-title">Insert Component</span>
           </div>
           <button type="button" class="be-panel__close" id="be-panel-insert-close" aria-label="Close Insert Panel">×</button>
         </header>
         <div class="be-panel__body be-panel__body--padded">
-          <div class="be-flow-insert-desc">Select a component to insert at the connector anchor dot:</div>
+          <div class="be-flow-insert-desc" id="be-insert-desc">Select a component to insert at the connector anchor dot:</div>
           
           <div class="be-component-options" id="be-comp-options">
             <label class="be-component-card be-component-card--selected" data-comp-type="shape">
@@ -220,115 +220,6 @@
           <button type="button" class="be-btn-primary" id="be-panel-insert-submit">Insert</button>
         </footer>
       </section>
-
-      <!-- OVERLAY PANEL: Node Specific Properties (Opened via Long-Press on Node) -->
-      <section class="be-overlay-panel be-overlay-panel--node-props be-hidden" id="be-panel-node-props" aria-label="Node Properties">
-        <header class="be-panel__header">
-          <div class="be-panel__title-group">
-            <span class="be-panel__title" id="be-props-title">Node Properties</span>
-            <span class="be-panel__badge" id="be-props-type-badge">SHAPE</span>
-          </div>
-          <button type="button" class="be-panel__close" id="be-panel-props-close" aria-label="Close Node Properties">×</button>
-        </header>
-        <div class="be-panel__body be-panel__body--padded">
-          <!-- Basic Identity & Label -->
-          <div class="be-props-meta" id="be-props-meta">ID: 1 | Center: (0, 0)</div>
-          <div class="be-form-group">
-            <label for="be-props-label-input" class="be-label">Node Label:</label>
-            <div class="be-inline-row">
-              <input type="text" class="be-input" id="be-props-label-input" placeholder="Node Label">
-              <button type="button" class="be-btn-mini" id="be-props-label-save">Save</button>
-            </div>
-          </div>
-
-          <!-- End / Stop Node Condition Section (Visible for End Nodes) -->
-          <div class="be-props-section be-hidden" id="be-props-stop-section">
-            <div class="be-props-section__title">Stop Condition (End Node)</div>
-            <div class="be-form-group">
-              <label for="be-stop-cond-type" class="be-label">Condition Type:</label>
-              <select class="be-input" id="be-stop-cond-type">
-                <option value="always">Immediate Stop (Always)</option>
-                <option value="time_running">Time Running (&gt;= ms)</option>
-                <option value="variable_equals">Variable Value Equals (==)</option>
-                <option value="variable_gte">Variable Value &gt;= Target</option>
-              </select>
-            </div>
-            <div class="be-form-group" id="be-stop-var-group">
-              <label for="be-stop-var-input" class="be-label">Variable Name:</label>
-              <input type="text" class="be-input" id="be-stop-var-input" placeholder="e.g. request_count">
-            </div>
-            <div class="be-form-group" id="be-stop-target-group">
-              <label for="be-stop-target-input" class="be-label">Target Value / Threshold:</label>
-              <input type="text" class="be-input" id="be-stop-target-input" placeholder="e.g. 3">
-            </div>
-            <div class="be-form-group" id="be-stop-time-group">
-              <label for="be-stop-time-input" class="be-label">Time Running Threshold (ms):</label>
-              <input type="number" class="be-input" id="be-stop-time-input" value="500" min="0">
-            </div>
-            <button type="button" class="be-btn-mini" id="be-stop-cond-save">Apply Stop Condition</button>
-          </div>
-
-          <!-- Shape-Specific Preset Fields (Functions & Attributes Added to Diagram) -->
-          <div class="be-props-section" id="be-props-presets-section">
-            <div class="be-props-section__title">Preset Fields (Shape Functions / Attributes)</div>
-            <div class="be-form-group">
-              <label for="be-preset-select" class="be-label">Select Pre-Made Field:</label>
-              <div class="be-inline-row">
-                <select class="be-input" id="be-preset-select"></select>
-                <button type="button" class="be-btn-mini" id="be-preset-add-btn">Add Preset</button>
-              </div>
-            </div>
-            <ul class="be-fields-list" id="be-preset-fields-list"></ul>
-            <div class="be-props-empty" id="be-preset-fields-empty">No preset fields added to diagram entry.</div>
-          </div>
-
-          <!-- Custom Fields (Constants Only Added to Diagram Entry) -->
-          <div class="be-props-section" id="be-props-custom-section">
-            <div class="be-props-section__title">Custom Fields (Diagram Constants)</div>
-            <div class="be-form-group">
-              <label for="be-custom-name-input" class="be-label">Field Name &amp; Type:</label>
-              <div class="be-inline-row">
-                <input type="text" class="be-input" id="be-custom-name-input" placeholder="field_name">
-                <select class="be-input be-input--narrow" id="be-custom-type-select">
-                  <option value="string">string</option>
-                  <option value="number">number</option>
-                  <option value="integer">integer</option>
-                  <option value="boolean">boolean</option>
-                </select>
-              </div>
-            </div>
-            <div class="be-form-group">
-              <label for="be-custom-val-input" class="be-label">Constant Value:</label>
-              <div class="be-inline-row">
-                <input type="text" class="be-input" id="be-custom-val-input" placeholder="value">
-                <button type="button" class="be-btn-mini" id="be-custom-add-btn">Add Custom</button>
-              </div>
-            </div>
-            <ul class="be-fields-list" id="be-custom-fields-list"></ul>
-            <div class="be-props-empty" id="be-custom-fields-empty">No custom constant fields on this node.</div>
-          </div>
-
-          <!-- Sanitized Node Options Schema Export / Import (No UUIDs, No Session Specifics, No Values) -->
-          <div class="be-props-section" id="be-props-options-schema-section">
-            <div class="be-props-section__title">Node Options Schema (Sanitized · No UUID / Session / Values)</div>
-            <div class="be-form-group">
-              <div class="be-inline-row be-inline-row--wrap">
-                <button type="button" class="be-btn-mini" id="be-node-schema-select-all">Select All</button>
-                <button type="button" class="be-btn-mini" id="be-node-schema-copy">Copy Schema</button>
-                <button type="button" class="be-btn-mini" id="be-node-schema-export">Export Options Schema</button>
-                <button type="button" class="be-btn-mini" id="be-node-schema-import-file">Import Schema File</button>
-                <button type="button" class="be-btn-mini" id="be-node-schema-apply-text">Apply Schema Text</button>
-              </div>
-              <textarea class="be-input be-node-schema-textarea" id="be-node-schema-textarea" rows="8" spellcheck="false" aria-label="Sanitized Node Options Schema JSON"></textarea>
-              <div class="be-props-empty" id="be-node-schema-status">Exports only structural field definitions (category, name, type, role) with zero personal identifiers, UUIDs, session data, or values.</div>
-            </div>
-          </div>
-        </div>
-        <footer class="be-panel__footer">
-          <span>FULL-SCREEN NODE PROPERTIES EDITOR</span>
-          <button type="button" class="be-btn-mini" id="be-panel-props-done">Done</button>
-        </footer>
-      </section>
     </main>
 
   </div>
@@ -361,6 +252,120 @@
       </div>
     </div>
   </div>
+
+  <!-- =========================================================
+       FULL-SCREEN HIGH-CONTRAST OVERLAY: Node Specific Properties
+       ========================================================= -->
+  <section class="be-overlay-panel be-overlay-panel--node-props be-hidden" id="be-panel-node-props" role="dialog" aria-modal="true" aria-label="Node Properties">
+    <header class="be-panel__header be-props-fullscreen-header">
+      <div class="be-panel__title-group">
+        <span class="be-panel__title" id="be-props-title">Node Properties</span>
+        <span class="be-panel__badge" id="be-props-type-badge">SHAPE</span>
+      </div>
+      <button type="button" class="be-panel__close" id="be-panel-props-close" aria-label="Close Node Properties" title="Close Overlay (Esc)">✕</button>
+    </header>
+    <div class="be-panel__body be-panel__body--padded be-props-fullscreen-body">
+      <!-- Basic Identity & Label -->
+      <div class="be-props-meta" id="be-props-meta">ID: 1 | Center: (0, 0)</div>
+      <div class="be-form-group">
+        <label for="be-props-label-input" class="be-label">Node Label:</label>
+        <div class="be-inline-row">
+          <input type="text" class="be-input" id="be-props-label-input" placeholder="Node Label">
+          <button type="button" class="be-btn-mini" id="be-props-label-save">Save</button>
+        </div>
+      </div>
+
+      <!-- End / Stop Node Condition Section (Visible for End Nodes) -->
+      <div class="be-props-section be-hidden" id="be-props-stop-section">
+        <div class="be-props-section__title">Stop Condition (End Node)</div>
+        <div class="be-form-group">
+          <label for="be-stop-cond-type" class="be-label">Condition Type:</label>
+          <select class="be-input" id="be-stop-cond-type">
+            <option value="always">Immediate Stop (Always)</option>
+            <option value="time_running">Time Running (&gt;= ms)</option>
+            <option value="variable_equals">Variable Value Equals (==)</option>
+            <option value="variable_gte">Variable Value &gt;= Target</option>
+          </select>
+        </div>
+        <div class="be-form-group" id="be-stop-var-group">
+          <label for="be-stop-var-input" class="be-label">Variable Name:</label>
+          <input type="text" class="be-input" id="be-stop-var-input" placeholder="e.g. request_count">
+        </div>
+        <div class="be-form-group" id="be-stop-target-group">
+          <label for="be-stop-target-input" class="be-label">Target Value / Threshold:</label>
+          <input type="text" class="be-input" id="be-stop-target-input" placeholder="e.g. 3">
+        </div>
+        <div class="be-form-group" id="be-stop-time-group">
+          <label for="be-stop-time-input" class="be-label">Time Running Threshold (ms):</label>
+          <input type="number" class="be-input" id="be-stop-time-input" value="500" min="0">
+        </div>
+        <button type="button" class="be-btn-mini" id="be-stop-cond-save">Apply Stop Condition</button>
+      </div>
+
+      <!-- Shape-Specific Preset Fields (Functions & Attributes Added to Diagram) -->
+      <div class="be-props-section" id="be-props-presets-section">
+        <div class="be-props-section__title">Preset Fields (Shape Functions / Attributes)</div>
+        <div class="be-form-group">
+          <label for="be-preset-select" class="be-label">Select Pre-Made Field:</label>
+          <div class="be-inline-row">
+            <select class="be-input" id="be-preset-select">
+              <option value="" selected disabled>-- Select Pre-Made Field --</option>
+            </select>
+            <button type="button" class="be-btn-mini" id="be-preset-add-btn">Add Preset</button>
+          </div>
+          <div class="be-props-feedback be-hidden" id="be-preset-feedback" role="status"></div>
+        </div>
+        <ul class="be-fields-list" id="be-preset-fields-list"></ul>
+        <div class="be-props-empty" id="be-preset-fields-empty">No preset fields added to diagram entry.</div>
+      </div>
+
+      <!-- Custom Fields (Constants Only Added to Diagram Entry) -->
+      <div class="be-props-section" id="be-props-custom-section">
+        <div class="be-props-section__title">Custom Fields (Diagram Constants)</div>
+        <div class="be-form-group">
+          <label for="be-custom-name-input" class="be-label">Field Name &amp; Type:</label>
+          <div class="be-inline-row">
+            <input type="text" class="be-input" id="be-custom-name-input" placeholder="field_name">
+            <select class="be-input be-input--narrow" id="be-custom-type-select">
+              <option value="string">string</option>
+              <option value="number">number</option>
+              <option value="integer">integer</option>
+              <option value="boolean">boolean</option>
+            </select>
+          </div>
+        </div>
+        <div class="be-form-group">
+          <label for="be-custom-val-input" class="be-label">Constant Value:</label>
+          <div class="be-inline-row">
+            <input type="text" class="be-input" id="be-custom-val-input" placeholder="value">
+            <button type="button" class="be-btn-mini" id="be-custom-add-btn">Add Custom</button>
+          </div>
+        </div>
+        <ul class="be-fields-list" id="be-custom-fields-list"></ul>
+        <div class="be-props-empty" id="be-custom-fields-empty">No custom constant fields on this node.</div>
+      </div>
+
+      <!-- Sanitized Node Options Schema Export / Import (No UUIDs, No Session Specifics, No Values) -->
+      <div class="be-props-section" id="be-props-options-schema-section">
+        <div class="be-props-section__title">Node Options Schema (Sanitized · No UUID / Session / Values)</div>
+        <div class="be-form-group">
+          <div class="be-inline-row be-inline-row--wrap">
+            <button type="button" class="be-btn-mini" id="be-node-schema-select-all">Select All</button>
+            <button type="button" class="be-btn-mini" id="be-node-schema-copy">Copy Schema</button>
+            <button type="button" class="be-btn-mini" id="be-node-schema-export">Export Options Schema</button>
+            <button type="button" class="be-btn-mini" id="be-node-schema-import-file">Import Schema File</button>
+            <button type="button" class="be-btn-mini" id="be-node-schema-apply-text">Apply Schema Text</button>
+          </div>
+          <textarea class="be-input be-node-schema-textarea" id="be-node-schema-textarea" rows="8" spellcheck="false" aria-label="Sanitized Node Options Schema JSON"></textarea>
+          <div class="be-props-empty" id="be-node-schema-status">Exports only structural field definitions (category, name, type, role) with zero personal identifiers, UUIDs, session data, or values.</div>
+        </div>
+      </div>
+    </div>
+    <footer class="be-panel__footer be-props-fullscreen-footer">
+      <span class="be-props-footer-meta">FULL-SCREEN HIGH-CONTRAST NODE PROPERTIES EDITOR</span>
+      <button type="button" class="be-btn-mini be-btn-props-done" id="be-panel-props-done">Done (Esc)</button>
+    </footer>
+  </section>
 
   <!-- Hidden file input for MFDB-132 single-file import -->
   <input type="file" id="be-mfdb-file-input" class="be-hidden" accept=".bejson,.json">

@@ -1,3 +1,14 @@
+# BEJSON_Flow 1.1.0 (PKG 109 -> PKG 110 · 2026-11-22)
+- Redirection Gate Side Anchor & Branch Node Insertion:
+  - Added interactive side anchor stub (`getRedirectSideAnchors()`, `.be-connector-line--redirect-stub`, and `.be-anchor-dot--redirect-branch`) extending from Redirection Gate nodes to represent an alternate branch that "goes nowhere until you add a node".
+  - Implemented `insertNodeOnRedirectBranch(redirectNodeId, options)` and `openInsertNodePanelForBranch(redirectNodeId)` enabling direct insertion of branch components that wire the alternate branch connector and clear the dangling stub upon addition.
+- Full-Screen True High-Contrast Node Properties Overlay:
+  - Relocated `#be-panel-node-props` to a top-level body element (`z-index: 10000`, `position: fixed`, `inset: 0`) to achieve an uncompromising viewport-wide full-screen overlay covering menubars, toolbars, and workspace.
+  - Engineered stark black-and-white high-contrast visual hierarchy: solid jet black (`#000000`) background, crisp white headings, labels, and borders (`#FFFFFF`), with white input boxes and white buttons with black font that dynamically switch to vivid red (`#DE2626`) background with white text when selected/focused/active.
+  - Added default null/placeholder option (`<option value="" selected disabled>-- Select Pre-Made Field --</option>`) to the premade field combo dropdown with validation feedback.
+  - Added visual confirmation feedback on the "Add Preset" button (`Added ✓` state) and contextual banner message (`✓ Added preset field '[name]' to node [...]`).
+  - Added keyboard `Escape` handler to gracefully dismiss full-screen overlays.
+
 # BEJSON_Flow 1.1.0 (PKG 108 -> PKG 109 · 2026-11-22)
 - Captured 5 live Playwright screenshots and downscaled to 420p (`420x262`) in `images/` (`01_startup_gate.png`, `02_insert_component_modal.png`, `03_flow_canvas_loopback.png`, `04_fullscreen_node_properties.png`, `05_flow_transport_and_schema.png`).
 - Authored 605-line technical `README.md` with embedded 420p visual figures, Mermaid architecture diagram, spatial mathematics, BEJSON 104a / Sanitized Node Options Schemas, JS API reference, and `flow_cli.js` command matrix (passed `readme_auditor.py` with zero violations).

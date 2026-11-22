@@ -243,6 +243,9 @@
     /* ---------------------------------------------------------
        Insert Component Panel (Midpoint & Loopback Anchor Dots)
        --------------------------------------------------------- */
+    let insertMode = 'connector'; // 'connector' or 'redirect_branch'
+    let activeRedirectBranchNodeId = null;
+
     function populateLoopbackTargetSelect(connectorId) {
       if (!loopbackTargetSelect) return;
       loopbackTargetSelect.innerHTML = '';
@@ -262,9 +265,40 @@
     }
 
     function openInsertNodePanel(connectorId, anchorIndex) {
+      insertMode = 'connector';
+      activeRedirectBranchNodeId = null;
       activeAnchorConnectorId = connectorId;
       activeAnchorIndex = Number.isInteger(anchorIndex) ? anchorIndex : 0;
+      const insertTitleEl = document.getElementById('be-insert-title');
+      const insertDescEl = document.getElementById('be-insert-desc');
+      if (insertTitleEl) insertTitleEl.textContent = 'Insert Component';
+      if (insertDescEl) insertDescEl.textContent = 'Select a component to insert at the connector anchor dot:';
       populateLoopbackTargetSelect(connectorId);
+      syncCompChoice('shape');
+      if (insertPanel) {
+        insertPanel.style.transform = 'translate(-50%, -50%)';
+        insertPanel.style.top = '50%';
+        insertPanel.style.left = '50%';
+        insertPanel.classList.remove('be-hidden');
+        if (nodeLabelInput) {
+          setTimeout(function () {
+            nodeLabelInput.focus();
+            nodeLabelInput.select();
+          }, 0);
+        }
+      }
+    }
+
+    function openInsertNodePanelForBranch(redirectNodeId) {
+      insertMode = 'redirect_branch';
+      activeRedirectBranchNodeId = redirectNodeId;
+      activeAnchorConnectorId = null;
+      activeAnchorIndex = 0;
+      const insertTitleEl = document.getElementById('be-insert-title');
+      const insertDescEl = document.getElementById('be-insert-desc');
+      if (insertTitleEl) insertTitleEl.textContent = `Insert Branch Component (Gate [${redirectNodeId}])`;
+      if (insertDescEl) insertDescEl.textContent = `Select a component to attach to the redirection side branch of Gate [${redirectNodeId}]:`;
+      populateLoopbackTargetSelect(null);
       syncCompChoice('shape');
       if (insertPanel) {
         insertPanel.style.transform = 'translate(-50%, -50%)';
@@ -283,6 +317,8 @@
     function closeInsertNodePanel() {
       activeAnchorConnectorId = null;
       activeAnchorIndex = 0;
+      activeRedirectBranchNodeId = null;
+      insertMode = 'connector';
       if (insertPanel) insertPanel.classList.add('be-hidden');
     }
 
@@ -323,10 +359,24 @@
 
     if (insertSubmitBtn) {
       insertSubmitBtn.addEventListener('click', function () {
-        if (activeAnchorConnectorId == null) return;
         const chosen = document.querySelector('input[name="flow-comp-choice"]:checked');
         const compType = chosen ? chosen.value : 'shape';
         const label = (nodeLabelInput ? nodeLabelInput.value.trim() : '') || 'Node';
+
+        // Redirection Gate side branch insertion (wires alternate branch connector)
+        if (insertMode === 'redirect_branch') {
+          if (activeRedirectBranchNodeId == null) return;
+          if (store.insertNodeOnRedirectBranch) {
+            store.insertNodeOnRedirectBranch(activeRedirectBranchNodeId, {
+              type: compType,
+              label: label
+            });
+          }
+          closeInsertNodePanel();
+          return;
+        }
+
+        if (activeAnchorConnectorId == null) return;
 
         if (compType === 'shape') {
           store.addNodeOnConnector(activeAnchorConnectorId, {
@@ -415,9 +465,16 @@
         }
       }
 
-      // 2. Populate Shape-Specific Preset Dropdown
+      // 2. Populate Shape-Specific Preset Dropdown with Default Null Option
       if (presetSelect) {
         presetSelect.innerHTML = '';
+        const nullOpt = document.createElement('option');
+        nullOpt.value = '';
+        nullOpt.textContent = '-- Select Pre-Made Field --';
+        nullOpt.selected = true;
+        nullOpt.disabled = true;
+        presetSelect.appendChild(nullOpt);
+
         const catalog = (FlowPresets && typeof FlowPresets.getPresetsForNodeType === 'function')
           ? FlowPresets.getPresetsForNodeType(node.type)
           : [];
@@ -604,13 +661,51 @@
 
     if (presetAddBtn) {
       presetAddBtn.addEventListener('click', function () {
-        if (activePropsNodeId == null || !presetSelect || !presetSelect.value) return;
+        const feedbackEl = document.getElementById('be-preset-feedback');
+        if (activePropsNodeId == null || !presetSelect) return;
+        const selectedValue = presetSelect.value;
+        if (!selectedValue) {
+          if (feedbackEl) {
+            feedbackEl.textContent = '⚠ Please select a pre-made field from the dropdown first.';
+            feedbackEl.className = 'be-props-feedback be-props-feedback--warning';
+            feedbackEl.classList.remove('be-hidden');
+          }
+          return;
+        }
+
         const node = store.getNodeById(activePropsNodeId);
         if (!node) return;
-        const def = FlowPresets ? FlowPresets.getPresetDefinition(node.type, presetSelect.value) : null;
+        const def = FlowPresets ? FlowPresets.getPresetDefinition(node.type, selectedValue) : null;
         const defaultVal = def ? def.defaultValue : '';
-        store.addOrUpdatePresetField(activePropsNodeId, presetSelect.value, defaultVal);
+        store.addOrUpdatePresetField(activePropsNodeId, selectedValue, defaultVal);
+
+        // Visual confirmation on button
+        const originalText = presetAddBtn.textContent;
+        presetAddBtn.textContent = 'Added ✓';
+        presetAddBtn.classList.add('be-btn--confirmed');
+        setTimeout(function () {
+          presetAddBtn.textContent = originalText;
+          presetAddBtn.classList.remove('be-btn--confirmed');
+        }, 1500);
+
         renderNodePropertiesPanel();
+
+        // Update feedback banner
+        const updatedFeedbackEl = document.getElementById('be-preset-feedback');
+        if (updatedFeedbackEl) {
+          updatedFeedbackEl.textContent = `✓ Added preset field '${selectedValue}' to node [${activePropsNodeId}].`;
+          updatedFeedbackEl.className = 'be-props-feedback be-props-feedback--success';
+          updatedFeedbackEl.classList.remove('be-hidden');
+        }
+      });
+    }
+
+    if (presetSelect) {
+      presetSelect.addEventListener('change', function () {
+        const feedbackEl = document.getElementById('be-preset-feedback');
+        if (feedbackEl && presetSelect.value) {
+          feedbackEl.classList.add('be-hidden');
+        }
       });
     }
 
@@ -915,6 +1010,16 @@
       }
     });
 
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        if (panelState.showNodeProps) {
+          closeNodePropertiesPanel();
+        } else if (insertPanel && !insertPanel.classList.contains('be-hidden')) {
+          closeInsertNodePanel();
+        }
+      }
+    });
+
     updateStatus();
 
     return {
@@ -922,6 +1027,7 @@
       openStartupGate: openStartupGate,
       closeStartupGate: closeStartupGate,
       openInsertNodePanel: openInsertNodePanel,
+      openInsertNodePanelForBranch: openInsertNodePanelForBranch,
       closeInsertNodePanel: closeInsertNodePanel,
       openNodePropertiesPanel: openNodePropertiesPanel,
       closeNodePropertiesPanel: closeNodePropertiesPanel,
