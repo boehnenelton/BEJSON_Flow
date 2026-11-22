@@ -2,7 +2,7 @@
 
 [![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm_Noncommercial_1.0.0-DE2626.svg)](LICENSE)
 [![Format: BEJSON 104a / MFDB-132](https://img.shields.io/badge/Format-BEJSON_104a_%7C_MFDB--132-000000.svg)](index.html)
-[![Version: 1.1.0 (PKG 109)](https://img.shields.io/badge/Version-1.1.0_(PKG_109)-DE2626.svg)](bejson_project.json)
+[![Version: 1.1.0 (PKG 110)](https://img.shields.io/badge/Version-1.1.0_(PKG_110)-DE2626.svg)](bejson_project.json)
 
 **BEJSON Flow** is a spatial directed-graph workflow editor, simulation engine, and command-line runtime built on top of the Universal Canvas Core Framework (`lib_bejson_canvas_core.js`) and the `Canvas_Flow` extension family. It combines deterministic 8-lane horizontal quantization and $R_y = 32\text{px}$ vertical rhythm with center-first `(cx, cy)` node addressing, midpoint and multi-anchor backward loopback connectors, shape-specific functional preset fields, constant custom fields, conditional termination gates, and interactive step-by-step flow execution.
 
@@ -55,13 +55,14 @@ Key technical capabilities include:
 1. **Mandatory Boundary Invariants (`Start` & `End` Nodes):** Every flow session initializes with connected `Start` and `End` boundary nodes that cannot be accidentally deleted, guaranteeing a well-defined entry origin and termination sink.
 2. **Anchor-Split Node Insertion:** Every connector line renders an interactive midpoint anchor dot (`radius = 6px`). Clicking any anchor dot splits the connector in-place and inserts a new flow component (`shape`, `redirect`, `variable`, or `loopback`) while automatically resolving spatial collisions via the underlying Minimum Translation Vector (MTV) engine.
 3. **Multi-Anchor Backward Loopback Routing (`loopback` Node):** Loopback nodes generate an orthogonal 3-segment U-loop return path offset above or below the primary flow axis. Each backward loop exposes **3 interactive anchor dots** (`Loop Exit Anchor`, `Loop Return Anchor`, and `Loop Re-entry Anchor`) so intermediate process, counter, or gate nodes can be inserted directly inside the backward loop.
-4. **Shape-Specific Preset Fields vs. Custom Constant Fields:**
-   - **Preset Fields:** Functional attributes and operations tailored to each shape type (`start`, `end`, `shape`, `redirect`, `variable`, `loopback`) that execute during flow traversal and serialize into the diagram's BEJSON record.
+4. **Redirection Gate Side Anchor Stubs (`redirect` Node):** Redirection decision gates expose a horizontal side stub (`ALT` branch anchor, $48\text{px}$ offset) with an interactive red side anchor dot. Clicking this side anchor launches the insertion palette to attach alternate branch nodes without dead-end routing.
+5. **Shape-Specific Preset Fields vs. Custom Constant Fields:**
+   - **Preset Fields:** Functional attributes and operations tailored to each shape type (`start`, `end`, `shape`, `redirect`, `variable`, `loopback`) that execute during flow traversal and serialize into the diagram's BEJSON record. The preset selection combo defaults to a neutral null state (`-- Select Pre-Made Field --`) with empty submission validation and visual confirmation (`Added ✓` feedback).
    - **Custom Fields:** User-defined typed constant metadata fields (`string`, `number`, `integer`, `boolean`) attached to a node's diagram record without side-effects during runtime execution.
-5. **Configurable End Node Stop Conditions:** The `End` node supports immediate termination (`always`), elapsed duration thresholds (`time_running >= max_time_ms`), exact variable equality (`variable_equals`), and numeric threshold gates (`variable_gte`).
-6. **Long-Press Full-Screen High-Contrast Node Properties Editor:** Holding pointer contact on any canvas node for `450ms` (with a `6px` drag-cancellation threshold) opens a full-screen (`100vw x 100vh`) high-contrast editor featuring white inputs and buttons with black typography that invert to `#DE2626` red backgrounds with `#FFFFFF` white typography when focused or active.
-7. **Sanitized Node Options Schema Export & Import:** Node option configurations can be exported and imported as standalone BEJSON 104a schemas (`flow_node_options_schema`) stripped of all personal identifiers, UUIDs, session specifics, spatial coordinates, and instance values.
-8. **Interactive Main Toolbar Transport (`Play`, `Pause`, `Resume`, `Stop`):** Selecting `Flow` in the primary toolbar exposes asynchronous step-by-step execution controls with live canvas node/connector highlighting and real-time step/elapsed-millisecond telemetry.
+6. **Configurable End Node Stop Conditions:** The `End` node supports immediate termination (`always`), elapsed duration thresholds (`time_running >= max_time_ms`), exact variable equality (`variable_equals`), and numeric threshold gates (`variable_gte`).
+7. **Long-Press Full-Screen High-Contrast Node Properties Overlay:** Holding pointer contact on any canvas node for `450ms` (with a `6px` drag-cancellation threshold) opens a full-screen (`100vw x 100vh`) root-level overlay with solid `#000000` background and high-contrast ergonomics: white inputs and buttons with black typography that invert to `#DE2626` red backgrounds with `#FFFFFF` white typography when focused or active, dismissible via `Escape` or the close control.
+8. **Sanitized Node Options Schema Export & Import:** Node option configurations can be exported and imported as standalone BEJSON 104a schemas (`flow_node_options_schema`) stripped of all personal identifiers, UUIDs, session specifics, spatial coordinates, and instance values.
+9. **Interactive Main Toolbar Transport (`Play`, `Pause`, `Resume`, `Stop`):** Selecting `Flow` in the primary toolbar exposes asynchronous step-by-step execution controls with live canvas node/connector highlighting and real-time step/elapsed-millisecond telemetry.
 
 ![Startup File Gate Modal](images/01_startup_gate.png)
 *_Figure 1: BEJSON Flow Startup File Gate enforcing session initialization or MFDB-132 package import._*
@@ -165,22 +166,32 @@ The backward return loop provides **3 distinct anchor points**:
 
 Clicking any of these 3 loopback anchor dots splits the return path and inserts intermediate nodes directly inside the backward loop.
 
+### 4.3.1 Redirection Gate Side Anchor Stubs & Alternate Branches
+
+Redirection gates (`redirect` shape nodes) evaluate conditional routing logic. In addition to the primary pass-through connector along the main horizontal spine, each redirection node renders a dedicated **Side Anchor Stub**:
+- **Geometry:** A dashed horizontal branch connector line protruding $48\text{px}$ from the node center (`pos_cx + 48px`, `pos_cy`) terminated by a labeled `ALT` branch badge.
+- **Interactive Side Anchor Dot:** An interactive red anchor dot (`radius = 6px`, `.be-anchor-dot--redirect-branch`) positioned at the end of the stub.
+- **Branch Node Insertion:** Clicking the redirection side anchor launches the component insertion overlay configured for alternate branch attachments (`openInsertNodePanelForBranch`). Selecting and submitting any node component automatically attaches it along the alternate path, preventing dead-end branch paths and maintaining structural flow integrity.
+
 ![Flow Canvas with Multi-Anchor Loopback](images/03_flow_canvas_loopback.png)
 *_Figure 3: 8-Lane / Ry=32px Flow Workspace showing Start, Retry Counter, Multi-Anchor Loopback (with 3 red-ringed return anchor dots), and End nodes._*
 
 ---
 
-### 4.4 Long-Press Full-Screen Node Properties Editor
+### 4.4 Long-Press Full-Screen Node Properties Overlay
 
-Dragging a node moves it immediately across the stage with real-time X/Y ruler trackers and MTV collision avoidance. Holding pointer contact on a node for **`450ms`** without moving more than `6px` triggers the **Full-Screen Node Properties Editor** (`#be-panel-node-props`).
+Dragging a node moves it immediately across the stage with real-time X/Y ruler trackers and MTV collision avoidance. Holding pointer contact on a node for **`450ms`** without moving more than `6px` triggers the **Full-Screen Node Properties Overlay** (`#be-panel-node-props`).
 
-The editor occupies the full viewport (`100vw x 100vh`) and enforces high-contrast Tri-Color ergonomics:
-- All input boxes, dropdown selects, textareas, and action buttons render with a `#FFFFFF` white background, `#000000` black text, and solid `1px` black borders in their resting state.
-- Any focused, selected, or active input box or button immediately switches to a `#DE2626` vivid red background with `#FFFFFF` white text.
-- From this screen you can edit the node label, configure **End Node Stop Conditions**, select and add shape-specific **Preset Fields**, add typed **Custom Constant Fields**, and export or import **Sanitized Node Options Schemas**.
+Situated at the root `<body>` DOM level to avoid parent container z-index clipping, the overlay occupies the full viewport (`100vw x 100vh`) against a solid `#000000` deep black backdrop and enforces strict high-contrast ergonomics:
+- **Resting High Contrast:** All input boxes, dropdown selects, textareas, and buttons render with a `#FFFFFF` white background, `#000000` black text, and crisp `1px` borders for maximum legibility.
+- **Vivid Red Focus State:** Any focused, selected, or active input box or button immediately switches to a `#DE2626` vivid red background with `#FFFFFF` pure white typography.
+- **Pre-Made Field Combo Null State:** The shape-specific preset field dropdown initializes with a neutral placeholder option (`-- Select Pre-Made Field --`, value `""`). Attempting to add without choosing a preset alerts the user with an actionable inline warning.
+- **Visual Button Confirmation:** Clicking **Add Pre-Made Field** switches the button text to **`Added ✓`** with an inline green confirmation banner (`Preset field added to node`), automatically reverting after `1500ms`.
+- **Keyboard & Touch Dismissal:** The overlay can be dismissed at any time by pressing `Escape` or clicking the top-right close button (`&times;`), preserving all modified node attributes.
+- **Options Schema Transfer:** From this screen you can also configure **End Node Stop Conditions**, attach typed **Custom Constant Fields**, and export or import **Sanitized Node Options Schemas**.
 
 ![Full-Screen High-Contrast Node Properties Editor](images/04_fullscreen_node_properties.png)
-*_Figure 4: Full-screen high-contrast Node Properties Editor showing a focused red input box with white text, shape preset fields, custom constant fields, and the sanitized Node Options Schema panel._*
+*_Figure 4: Full-screen high-contrast Node Properties Overlay showing a focused red input box with white text, shape preset fields, custom constant fields, and the sanitized Node Options Schema panel._*
 
 ---
 
@@ -256,7 +267,7 @@ BEJSON_Flow/
 ├── CHANGELOG.md                     # Versioned package release notes
 ├── LICENSE                          # PolyForm Noncommercial License 1.0.0
 ├── README.md                        # Repository documentation
-├── bejson_project.json              # BEJSON 104a project manifest (PKG 109)
+├── bejson_project.json              # BEJSON 104a project manifest (PKG 110)
 ├── index.html                       # Application shell & overlay panel markup
 ├── css/
 │   ├── behtml_base.css              # Tri-Color spatial shell, toolbars, rulers & stage
@@ -487,6 +498,15 @@ const counter = store.addVariableNodeOnConnector(c0.id, {
 store.addOrUpdatePresetField(1, 'initial_payload', 'tx_900');
 store.addOrUpdateCustomField(counter.newNode.id, 'max_timeout_sec', 'integer', 30);
 
+// Query redirection gate side anchors and insert branch nodes
+const sideAnchors = store.getRedirectSideAnchors();
+if (sideAnchors.length > 0) {
+  store.insertNodeOnRedirectBranch(sideAnchors[0].nodeId, {
+    type: 'shape',
+    label: 'Alternate Handler'
+  });
+}
+
 // Export & re-import sanitized node options schema
 const optsSchema = store.exportNodeOptionsSchema(counter.newNode.id);
 store.importNodeOptionsSchema(1, optsSchema, { replace: false });
@@ -562,7 +582,7 @@ node lib/Canvas_Flow/flow_cli.js import-node-options ./my_flow.104a.bejson \
 
 ## 11. Testing, Hardening & Verification Suite
 
-Run the unit and hostile boundary test suite (`15` verification sections covering center-first coordinates, connector layering, variable counters, redirection gates, preset fields, custom constant fields, stop conditions, 3-anchor loopback routing, in-loop anchor insertion, interactive runtime state transitions, BEJSON 104a round-trip serialization, sanitized node options schemas, prototype-pollution rejection, corrupt import recovery, and mid-run mutation safety):
+Run the unit and hostile boundary test suite (`16` verification sections covering center-first coordinates, connector layering, variable counters, redirection gates, preset fields, custom constant fields, stop conditions, 3-anchor loopback routing, in-loop anchor insertion, interactive runtime state transitions, BEJSON 104a round-trip serialization, sanitized node options schemas, prototype-pollution rejection, corrupt import recovery, mid-run mutation safety, and redirection gate side anchor stubs):
 
 ```bash
 node lib/Canvas_Flow/tests/test_canvas_flow.js
@@ -591,6 +611,7 @@ Expected output:
 ✓ Accumulator loop template verified.
 ✓ Canvas_Flow error registry (650-660) verified.
 ✓ Hostile boundary, prototype-pollution, corrupt import, and mid-run mutation tests verified.
+✓ Redirection Gate side anchor stub and branch node insertion verified.
 --- All Canvas Flow Tests Passed Successfully! ---
 ```
 
