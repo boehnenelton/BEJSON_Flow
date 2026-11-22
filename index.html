@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Canvas Core Framework</title>
+  <title>BEJSON Flow</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="css/behtml_base.css">
   <link rel="stylesheet" href="css/behtml_panels.css">
 </head>
@@ -15,7 +16,7 @@
       <div class="be-menubar__item" data-menu="file">
         <button type="button" class="be-menubar__trigger" aria-haspopup="true" aria-expanded="false">File</button>
         <div class="be-menubar__dropdown" role="menu">
-          <button type="button" class="be-menubar__option" role="menuitem" data-action="file:new">New Canvas</button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="file:new">New Flow</button>
           <button type="button" class="be-menubar__option" role="menuitem" data-action="file:open">Import MFDB-132</button>
           <button type="button" class="be-menubar__option" role="menuitem" data-action="file:save">Export MFDB-132</button>
         </div>
@@ -26,6 +27,7 @@
         <div class="be-menubar__dropdown" role="menu">
           <button type="button" class="be-menubar__option" role="menuitem" data-action="edit:undo">Undo</button>
           <button type="button" class="be-menubar__option" role="menuitem" data-action="edit:redo">Redo</button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-action="edit:properties">Node Properties</button>
           <button type="button" class="be-menubar__option" role="menuitem" data-action="edit:delete">Delete Selected</button>
         </div>
       </div>
@@ -53,6 +55,7 @@
         <div class="be-menubar__dropdown" role="menu">
           <button type="button" class="be-menubar__option" role="menuitem" data-select-tool="selector">Selector</button>
           <button type="button" class="be-menubar__option" role="menuitem" data-select-tool="shape">Shape</button>
+          <button type="button" class="be-menubar__option" role="menuitem" data-select-tool="flow">Flow Transport</button>
         </div>
       </div>
 
@@ -92,6 +95,7 @@
 
       <div class="be-canvas-stage" id="be-canvas-stage">
         <canvas class="be-base-grid" id="be-base-grid"></canvas>
+        <svg class="be-connector-layer" id="be-connector-layer"></svg>
         <div class="be-object-layer" id="be-object-layer"></div>
         <div class="be-coords-hud" id="be-coords-hud">X: 0  Y: 0</div>
       </div>
@@ -111,7 +115,7 @@
         </div>
         <footer class="be-panel__footer">
           <span>MFDB ENTITIES</span>
-          <span>1 OBJECT = 1 ENTITY</span>
+          <span>LONG-PRESS NODE FOR PROPS</span>
         </footer>
       </section>
 
@@ -139,6 +143,192 @@
           </div>
         </footer>
       </section>
+
+      <!-- OVERLAY PANEL: Insert Component at Flow Anchor -->
+      <section class="be-overlay-panel be-overlay-panel--insert-node be-hidden" id="be-panel-insert-node" aria-label="Insert Component">
+        <header class="be-panel__header">
+          <div class="be-panel__title-group">
+            <span class="be-panel__title">Insert Component</span>
+          </div>
+          <button type="button" class="be-panel__close" id="be-panel-insert-close" aria-label="Close Insert Panel">×</button>
+        </header>
+        <div class="be-panel__body be-panel__body--padded">
+          <div class="be-flow-insert-desc">Select a component to insert at the connector anchor dot:</div>
+          
+          <div class="be-component-options" id="be-comp-options">
+            <label class="be-component-card be-component-card--selected" data-comp-type="shape">
+              <input type="radio" name="flow-comp-choice" value="shape" checked class="be-comp-radio">
+              <div class="be-comp-info">
+                <div class="be-comp-title">Process Action</div>
+                <div class="be-comp-sub">Standard process / action shape</div>
+              </div>
+            </label>
+            
+            <label class="be-component-card" data-comp-type="redirect">
+              <input type="radio" name="flow-comp-choice" value="redirect" class="be-comp-radio">
+              <div class="be-comp-info">
+                <div class="be-comp-title">Redirection Gate</div>
+                <div class="be-comp-sub">Conditional routing or feature flag gate</div>
+              </div>
+            </label>
+
+            <label class="be-component-card" data-comp-type="variable">
+              <input type="radio" name="flow-comp-choice" value="variable" class="be-comp-radio">
+              <div class="be-comp-info">
+                <div class="be-comp-title">Variable / Counter</div>
+                <div class="be-comp-sub">Auto-incrementing counter (+1) or variable</div>
+              </div>
+            </label>
+
+            <label class="be-component-card" data-comp-type="loopback">
+              <input type="radio" name="flow-comp-choice" value="loopback" class="be-comp-radio">
+              <div class="be-comp-info">
+                <div class="be-comp-title">Loopback Shape</div>
+                <div class="be-comp-sub">Multi-anchor backward return loop to upstream node</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="be-form-group">
+            <label for="be-node-label-input" class="be-label">Label / Name:</label>
+            <input type="text" class="be-input" id="be-node-label-input" value="Process Step" placeholder="e.g. Process Step">
+          </div>
+
+          <div class="be-form-group be-hidden" id="be-redirect-options">
+            <label for="be-feature-flag-input" class="be-label">Feature Flag Key:</label>
+            <input type="text" class="be-input" id="be-feature-flag-input" value="feature_active" placeholder="e.g. feature_active">
+          </div>
+
+          <div class="be-form-group be-hidden" id="be-variable-options">
+            <label for="be-var-mode-select" class="be-label">Variable Mode:</label>
+            <select class="be-input" id="be-var-mode-select">
+              <option value="counter" selected>Counter (+1 auto-increment)</option>
+              <option value="declare">Custom Field Declaration</option>
+              <option value="accumulate">Accumulate (+step_delta)</option>
+            </select>
+          </div>
+
+          <div class="be-form-group be-hidden" id="be-loopback-options">
+            <label for="be-loopback-target-select" class="be-label">Loop Back To Node:</label>
+            <select class="be-input" id="be-loopback-target-select"></select>
+            <label for="be-loopback-count-input" class="be-label">Max Loop Iterations:</label>
+            <input type="number" class="be-input" id="be-loopback-count-input" value="2" min="1" max="50">
+          </div>
+        </div>
+        <footer class="be-panel__footer">
+          <button type="button" class="be-btn-secondary" id="be-panel-insert-cancel">Cancel</button>
+          <button type="button" class="be-btn-primary" id="be-panel-insert-submit">Insert</button>
+        </footer>
+      </section>
+
+      <!-- OVERLAY PANEL: Node Specific Properties (Opened via Long-Press on Node) -->
+      <section class="be-overlay-panel be-overlay-panel--node-props be-hidden" id="be-panel-node-props" aria-label="Node Properties">
+        <header class="be-panel__header">
+          <div class="be-panel__title-group">
+            <span class="be-panel__title" id="be-props-title">Node Properties</span>
+            <span class="be-panel__badge" id="be-props-type-badge">SHAPE</span>
+          </div>
+          <button type="button" class="be-panel__close" id="be-panel-props-close" aria-label="Close Node Properties">×</button>
+        </header>
+        <div class="be-panel__body be-panel__body--padded">
+          <!-- Basic Identity & Label -->
+          <div class="be-props-meta" id="be-props-meta">ID: 1 | Center: (0, 0)</div>
+          <div class="be-form-group">
+            <label for="be-props-label-input" class="be-label">Node Label:</label>
+            <div class="be-inline-row">
+              <input type="text" class="be-input" id="be-props-label-input" placeholder="Node Label">
+              <button type="button" class="be-btn-mini" id="be-props-label-save">Save</button>
+            </div>
+          </div>
+
+          <!-- End / Stop Node Condition Section (Visible for End Nodes) -->
+          <div class="be-props-section be-hidden" id="be-props-stop-section">
+            <div class="be-props-section__title">Stop Condition (End Node)</div>
+            <div class="be-form-group">
+              <label for="be-stop-cond-type" class="be-label">Condition Type:</label>
+              <select class="be-input" id="be-stop-cond-type">
+                <option value="always">Immediate Stop (Always)</option>
+                <option value="time_running">Time Running (&gt;= ms)</option>
+                <option value="variable_equals">Variable Value Equals (==)</option>
+                <option value="variable_gte">Variable Value &gt;= Target</option>
+              </select>
+            </div>
+            <div class="be-form-group" id="be-stop-var-group">
+              <label for="be-stop-var-input" class="be-label">Variable Name:</label>
+              <input type="text" class="be-input" id="be-stop-var-input" placeholder="e.g. request_count">
+            </div>
+            <div class="be-form-group" id="be-stop-target-group">
+              <label for="be-stop-target-input" class="be-label">Target Value / Threshold:</label>
+              <input type="text" class="be-input" id="be-stop-target-input" placeholder="e.g. 3">
+            </div>
+            <div class="be-form-group" id="be-stop-time-group">
+              <label for="be-stop-time-input" class="be-label">Time Running Threshold (ms):</label>
+              <input type="number" class="be-input" id="be-stop-time-input" value="500" min="0">
+            </div>
+            <button type="button" class="be-btn-mini" id="be-stop-cond-save">Apply Stop Condition</button>
+          </div>
+
+          <!-- Shape-Specific Preset Fields (Functions & Attributes Added to Diagram) -->
+          <div class="be-props-section" id="be-props-presets-section">
+            <div class="be-props-section__title">Preset Fields (Shape Functions / Attributes)</div>
+            <div class="be-form-group">
+              <label for="be-preset-select" class="be-label">Select Pre-Made Field:</label>
+              <div class="be-inline-row">
+                <select class="be-input" id="be-preset-select"></select>
+                <button type="button" class="be-btn-mini" id="be-preset-add-btn">Add Preset</button>
+              </div>
+            </div>
+            <ul class="be-fields-list" id="be-preset-fields-list"></ul>
+            <div class="be-props-empty" id="be-preset-fields-empty">No preset fields added to diagram entry.</div>
+          </div>
+
+          <!-- Custom Fields (Constants Only Added to Diagram Entry) -->
+          <div class="be-props-section" id="be-props-custom-section">
+            <div class="be-props-section__title">Custom Fields (Diagram Constants)</div>
+            <div class="be-form-group">
+              <label for="be-custom-name-input" class="be-label">Field Name &amp; Type:</label>
+              <div class="be-inline-row">
+                <input type="text" class="be-input" id="be-custom-name-input" placeholder="field_name">
+                <select class="be-input be-input--narrow" id="be-custom-type-select">
+                  <option value="string">string</option>
+                  <option value="number">number</option>
+                  <option value="integer">integer</option>
+                  <option value="boolean">boolean</option>
+                </select>
+              </div>
+            </div>
+            <div class="be-form-group">
+              <label for="be-custom-val-input" class="be-label">Constant Value:</label>
+              <div class="be-inline-row">
+                <input type="text" class="be-input" id="be-custom-val-input" placeholder="value">
+                <button type="button" class="be-btn-mini" id="be-custom-add-btn">Add Custom</button>
+              </div>
+            </div>
+            <ul class="be-fields-list" id="be-custom-fields-list"></ul>
+            <div class="be-props-empty" id="be-custom-fields-empty">No custom constant fields on this node.</div>
+          </div>
+
+          <!-- Sanitized Node Options Schema Export / Import (No UUIDs, No Session Specifics, No Values) -->
+          <div class="be-props-section" id="be-props-options-schema-section">
+            <div class="be-props-section__title">Node Options Schema (Sanitized · No UUID / Session / Values)</div>
+            <div class="be-form-group">
+              <div class="be-inline-row be-inline-row--wrap">
+                <button type="button" class="be-btn-mini" id="be-node-schema-select-all">Select All</button>
+                <button type="button" class="be-btn-mini" id="be-node-schema-copy">Copy Schema</button>
+                <button type="button" class="be-btn-mini" id="be-node-schema-export">Export Options Schema</button>
+                <button type="button" class="be-btn-mini" id="be-node-schema-import-file">Import Schema File</button>
+                <button type="button" class="be-btn-mini" id="be-node-schema-apply-text">Apply Schema Text</button>
+              </div>
+              <textarea class="be-input be-node-schema-textarea" id="be-node-schema-textarea" rows="8" spellcheck="false" aria-label="Sanitized Node Options Schema JSON"></textarea>
+              <div class="be-props-empty" id="be-node-schema-status">Exports only structural field definitions (category, name, type, role) with zero personal identifiers, UUIDs, session data, or values.</div>
+            </div>
+          </div>
+        </div>
+        <footer class="be-panel__footer">
+          <span>FULL-SCREEN NODE PROPERTIES EDITOR</span>
+          <button type="button" class="be-btn-mini" id="be-panel-props-done">Done</button>
+        </footer>
+      </section>
     </main>
 
   </div>
@@ -147,16 +337,16 @@
   <div class="be-startup-gate" id="be-startup-gate" role="dialog" aria-modal="true" aria-labelledby="be-startup-title">
     <div class="be-startup-card">
       <header class="be-startup-card__header">
-        <span id="be-startup-title">Canvas Core Framework</span>
+        <span id="be-startup-title">BEJSON Flow</span>
         <span class="be-startup-card__tag">MFDB-132</span>
       </header>
 
       <div class="be-startup-card__section">
-        <h2 class="be-startup-card__heading">Create New File</h2>
-        <p class="be-startup-card__desc">Initialize a new MFDB-132 canvas session. Each placed object is tracked as its own BEJSON 104 MFDB entity.</p>
+        <h2 class="be-startup-card__heading">Create New Flow</h2>
+        <p class="be-startup-card__desc">Initialize a new MFDB-132 flow session. Each placed object is tracked as its own BEJSON 104 MFDB entity.</p>
         <div class="be-startup-form-row">
-          <input type="text" class="be-input" id="be-startup-dbname" value="untitled_canvas" placeholder="project_name" aria-label="Database Name">
-          <button type="button" class="be-btn-primary" id="be-startup-create">Create New</button>
+          <input type="text" class="be-input" id="be-startup-dbname" value="untitled_flow" placeholder="flow_name" aria-label="Database Name">
+          <button type="button" class="be-btn-primary" id="be-startup-create">New Flow</button>
         </div>
       </div>
 
@@ -174,25 +364,32 @@
 
   <!-- Hidden file input for MFDB-132 single-file import -->
   <input type="file" id="be-mfdb-file-input" class="be-hidden" accept=".bejson,.json">
+  <!-- Hidden file input for Sanitized Node Options Schema import -->
+  <input type="file" id="be-node-options-file-input" class="be-hidden" accept=".bejson,.json">
 
   <!-- =========================================================
        IMPORTED CORE JS LIBRARIES (libraries_105/Lib_JS/Core)
        ========================================================= -->
-  <script src="lib/core/lib_bejson_Core_bejson_errors.js"></script>
-  <script src="lib/core/lib_bejson_Core_bejson_parse.js"></script>
-  <script src="lib/core/lib_bejson_Core_bejson_schema.js"></script>
-  <script src="lib/core/lib_bejson_Core_bejson_secure_zip.js"></script>
-  <script src="lib/core/lib_bejson_Core_bejson_state.js"></script>
-  <script src="lib/core/lib_bejson_Core_bejson_validator.js"></script>
-  <script src="lib/core/lib_bejson_Core_bejson_core.js"></script>
-  <script src="lib/core/lib_bejson_Core_bejson_core_nesting.js"></script>
-  <script src="lib/core/lib_bejson_Core_bejson_bejson.js"></script>
-  <script src="lib/core/lib_bejson_Core_mfdb_validator.js"></script>
-  <script src="lib/core/lib_bejson_Core_mfdb_core.js"></script>
-  <script src="lib/core/lib_bejson_Core_bejson_chunking.js"></script>
+  <script src="lib/Core/lib_bejson_Core_bejson_errors.js"></script>
+  <script src="lib/Core/lib_bejson_Core_bejson_parse.js"></script>
+  <script src="lib/Core/lib_bejson_Core_bejson_schema.js"></script>
+  <script src="lib/Core/lib_bejson_Core_bejson_secure_zip.js"></script>
+  <script src="lib/Core/lib_bejson_Core_bejson_state.js"></script>
+  <script src="lib/Core/lib_bejson_Core_bejson_validator.js"></script>
+  <script src="lib/Core/lib_bejson_Core_bejson_core.js"></script>
+  <script src="lib/Core/lib_bejson_Core_mfdb_validator.js"></script>
+  <script src="lib/Core/lib_bejson_Core_mfdb_core.js"></script>
 
-  <!-- NEW CANVAS CORE BACKEND LIBRARY -->
-  <script src="lib/lib_bejson_canvas_core.js"></script>
+  <!-- CANVAS CORE BACKEND LIBRARY -->
+  <script src="lib/Canvas/lib_bejson_canvas_core.js"></script>
+
+  <!-- CANVAS FLOW EXTENSION LIBRARIES -->
+  <script src="lib/Canvas_Flow/lib_bejson_Canvas_Flow_schemas.js"></script>
+  <script src="lib/Canvas_Flow/lib_bejson_Canvas_Flow_presets.js"></script>
+  <script src="lib/Canvas_Flow/lib_bejson_Canvas_Flow_validator.js"></script>
+  <script src="lib/Canvas_Flow/lib_bejson_Canvas_Flow_core.js"></script>
+  <script src="lib/Canvas_Flow/lib_bejson_Canvas_Flow_runtime.js"></script>
+  <script src="lib/Canvas_Flow/lib_bejson_Canvas_Flow_templates.js"></script>
 
   <!-- SEPARATED FRONTEND UI MODULES -->
   <script src="js/app_tools.js"></script>

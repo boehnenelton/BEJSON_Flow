@@ -1,13 +1,20 @@
 /**
  * Module: js/app_main.js
- * Purpose: Application bootstrap, menu bar controller, keyboard shortcuts, and module wiring.
+ * Purpose: Application bootstrap, flow runtime initialization, menu bar controller,
+ *          keyboard shortcuts, and module wiring.
  */
 
 (function () {
   'use strict';
 
-  const store = window.BEJSON_CANVAS_CORE.createCanvasStore();
+  const store = (window.BEJSON_CANVAS_FLOW && typeof window.BEJSON_CANVAS_FLOW.createFlowStore === 'function')
+    ? window.BEJSON_CANVAS_FLOW.createFlowStore({ name: 'untitled_flow' })
+    : window.BEJSON_CANVAS_CORE.createCanvasStore();
   const state = store.state;
+
+  const runtime = (window.BEJSON_CANVAS_FLOW_RUNTIME && typeof window.BEJSON_CANVAS_FLOW_RUNTIME.createFlowRuntime === 'function')
+    ? window.BEJSON_CANVAS_FLOW_RUNTIME.createFlowRuntime(store, { stepIntervalMs: 350 })
+    : null;
 
   const mainToolsTrack = document.getElementById('be-maintools-track');
   const toolOptionsTrack = document.getElementById('be-tooloptions-track');
@@ -15,6 +22,7 @@
 
   const stage = document.getElementById('be-canvas-stage');
   const objectLayer = document.getElementById('be-object-layer');
+  const connectorLayer = document.getElementById('be-connector-layer');
   const baseGridCanvas = document.getElementById('be-base-grid');
   const rulerXCanvas = document.getElementById('be-ruler-x-canvas');
   const rulerYCanvas = document.getElementById('be-ruler-y-canvas');
@@ -29,6 +37,7 @@
   // Initialize separated UI modules
   const tools = window.BEAppTools.init({
     store: store,
+    runtime: runtime,
     mainToolsTrack: mainToolsTrack,
     toolOptionsTrack: toolOptionsTrack,
     stage: stage
@@ -47,6 +56,7 @@
     store: store,
     stage: stage,
     objectLayer: objectLayer,
+    connectorLayer: connectorLayer,
     trackerX: trackerX,
     trackerY: trackerY,
     rulers: rulers,
@@ -64,6 +74,10 @@
     stage: stage,
     onPanelsChanged: syncMenuChecks
   });
+
+  if (typeof canvas.setPanels === 'function') {
+    canvas.setPanels(panels);
+  }
 
   /* ---------------------------------------------------------
      Menu Bar Dropdown Logic
@@ -129,6 +143,10 @@
         store.undo();
       } else if (action === 'edit:redo') {
         store.redo();
+      } else if (action === 'edit:properties') {
+        if (state.selectedNodeId != null) {
+          panels.openNodePropertiesPanel(state.selectedNodeId);
+        }
       } else if (action === 'edit:delete') {
         store.deleteSelected();
       } else if (action === 'view:grid') {
@@ -151,12 +169,19 @@
 
   document.addEventListener('keydown', function (e) {
     const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
-    const isTyping = tag === 'INPUT' || tag === 'TEXTAREA';
+    const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
 
     if (e.key === 'Escape') {
       closeAllMenus();
+      if (panels && typeof panels.closeInsertNodePanel === 'function') {
+        panels.closeInsertNodePanel();
+      }
+      if (panels && typeof panels.closeNodePropertiesPanel === 'function') {
+        panels.closeNodePropertiesPanel();
+      }
       if (!isTyping) {
-        store.selectObject(null);
+        if (store.selectNode) store.selectNode(null);
+        else if (store.selectObject) store.selectObject(null);
         rulers.updateHud();
       }
       return;
@@ -203,6 +228,7 @@
   // Expose app handle for debugging/inspection
   window.BEHTML_FLOW_APP = {
     store: store,
+    runtime: runtime,
     tools: tools,
     rulers: rulers,
     canvas: canvas,

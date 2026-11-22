@@ -126,7 +126,9 @@
 
     function updateHud(cursorX, cursorY) {
       const lanePx = Math.round(getLaneWidth());
-      const sel = state.shapes.find(function (s) { return s.id === state.selectedShapeId; });
+      const shapes = state.shapes || state.nodes || [];
+      const selectedId = state.selectedShapeId !== undefined ? state.selectedShapeId : state.selectedNodeId;
+      const sel = shapes.find(function (s) { return s.id === selectedId; });
 
       let text = '';
       if (cursorX !== null && cursorX !== undefined && cursorY !== null && cursorY !== undefined) {

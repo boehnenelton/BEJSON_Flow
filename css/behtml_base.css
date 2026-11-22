@@ -234,8 +234,20 @@ body {
   color: var(--be-white);
 }
 
-.be-tool-btn--active .be-tool-btn__label {
+.be-tool-btn--active .be-tool-btn__label,
+.be-tool-btn--labeled .be-tool-btn__label {
   display: inline;
+}
+
+.be-flow-status-strip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  font-family: var(--be-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--be-black);
+  white-space: nowrap;
 }
 
 /* =========================================================
@@ -337,12 +349,70 @@ body {
   display: block;
 }
 
+/* Connector Layer (zIndex = 1, Behind Shapes) */
+.be-connector-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.be-connector-line {
+  stroke: var(--be-black);
+  stroke-width: 2px;
+}
+
+.be-connector-line--loopback {
+  stroke-dasharray: 6 3;
+}
+
+.be-connector-line--active {
+  stroke: var(--be-red);
+  stroke-width: 3px;
+}
+
+.be-connector-arrow {
+  fill: var(--be-black);
+}
+
+.be-connector-arrow--active {
+  fill: var(--be-red);
+}
+
+.be-anchor-dot {
+  fill: var(--be-white);
+  stroke: var(--be-black);
+  stroke-width: 2px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: r 0.15s ease, fill 0.15s ease;
+}
+
+.be-anchor-dot--loopback {
+  stroke: var(--be-red);
+}
+
+.be-anchor-dot:hover {
+  fill: var(--be-red);
+  stroke: var(--be-red);
+}
+
+.be-anchor-hit {
+  fill: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
 /* Independent Above Layer for Diagram Objects */
 .be-object-layer {
   position: absolute;
   inset: 0;
   z-index: 2;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .be-shape {
@@ -351,6 +421,13 @@ body {
   border: 2px solid var(--be-black);
   cursor: grab;
   touch-action: none;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px;
 }
 
 .be-shape:active {
@@ -359,6 +436,88 @@ body {
 
 .be-shape--selected {
   border-color: var(--be-red);
+}
+
+.be-shape--runtime-active {
+  border-color: var(--be-red);
+  border-width: 3px;
+  box-shadow: 0 0 0 3px rgba(222, 38, 38, 0.25);
+}
+
+.be-shape--start {
+  border-width: 3px;
+}
+
+.be-shape--end {
+  border-width: 3px;
+  outline: 2px solid var(--be-black);
+  outline-offset: 2px;
+}
+
+.be-shape--redirect {
+  border-color: #B45309;
+}
+
+.be-shape--variable {
+  border-style: dashed;
+}
+
+.be-shape--loopback {
+  border-style: double;
+  border-width: 4px;
+}
+
+.be-node-pill {
+  font-family: var(--be-font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  background-color: var(--be-black);
+  color: var(--be-white);
+  margin-bottom: 3px;
+  pointer-events: none;
+}
+
+.be-node-pill--start {
+  background-color: #15803D;
+}
+
+.be-node-pill--end {
+  background-color: var(--be-red);
+}
+
+.be-node-pill--redirect {
+  background-color: #B45309;
+}
+
+.be-node-pill--variable,
+.be-node-pill--var {
+  background-color: #1D4ED8;
+}
+
+.be-node-pill--loopback {
+  background-color: var(--be-black);
+}
+
+.be-node-label {
+  font-family: var(--be-font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--be-black);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.be-node-fields-badge {
+  font-family: var(--be-font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--be-red);
+  margin-top: 2px;
+  pointer-events: none;
 }
 
 /* Center crosshair pip on selected shape */
