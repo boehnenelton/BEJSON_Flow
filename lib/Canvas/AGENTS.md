@@ -53,3 +53,8 @@
   1. Zero-error loading alongside all `Lib_JS/Core/` modules.
   2. `MFDB-132` single-file export passes `MFDB_VALIDATOR` and `BEJSON_VALIDATOR`.
   3. Export-to-import round-trip preserves all MFDB entities and coordinates identically.
+
+## 7. Recorded User Exemption (2026-11-23)
+The owner granted an explicit, scoped exemption to the immutability law above: `lib/Canvas/` (canvas core and the Canvas
+family) may be modified, **gated behind `canvasMode` (0 default)**. `lib/Core/` (the Core family) remains frozen. All Canvas
+changes require golden-file parity for mode 0 (`lib/Canvas/tests/test_canvas_mode0_golden.js`).

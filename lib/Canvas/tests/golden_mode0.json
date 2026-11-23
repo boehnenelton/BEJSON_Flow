@@ -1,0 +1,467 @@
+{
+  "head": {
+    "Format": "BEJSON",
+    "Format_Version": "104a",
+    "Format_Creator": "Elton Boehnen",
+    "Schema_Name": "MFDB-132",
+    "Schema_Version": "1.0.1",
+    "Schema_Description": "MFDB-132 single-file package mapping each BEHTML canvas object to an MFDB entity.",
+    "Chunk_Date": "<date>",
+    "Session_Is_Mounted": false,
+    "Mount_Path": "",
+    "Package_Version": "1",
+    "MFDB_Version": "1.32",
+    "DB_Name": "golden",
+    "Package_Format": "MFDB-Chunked-104a",
+    "Records_Type": [
+      "MFDB-132"
+    ],
+    "Fields": [
+      {
+        "name": "File_Name",
+        "type": "string"
+      },
+      {
+        "name": "File_Extension",
+        "type": "string"
+      },
+      {
+        "name": "File_Content",
+        "type": "string"
+      },
+      {
+        "name": "File_Version",
+        "type": "string"
+      },
+      {
+        "name": "File_Hash",
+        "type": "string"
+      },
+      {
+        "name": "Relative_Path",
+        "type": "string"
+      },
+      {
+        "name": "Is_Binary",
+        "type": "boolean"
+      },
+      {
+        "name": "Is_Mounted",
+        "type": "boolean"
+      }
+    ],
+    "Values": []
+  },
+  "files": [
+    {
+      "path": "104a.mfdb.bejson",
+      "content": {
+        "Format": "BEJSON",
+        "Format_Version": "104a",
+        "Format_Creator": "Elton Boehnen",
+        "MFDB_Version": "1.31",
+        "DB_Name": "golden",
+        "Network_Role": "Master",
+        "Records_Type": [
+          "mfdb"
+        ],
+        "Fields": [
+          {
+            "name": "entity_name",
+            "type": "string"
+          },
+          {
+            "name": "file_path",
+            "type": "string"
+          },
+          {
+            "name": "record_count",
+            "type": "integer"
+          },
+          {
+            "name": "schema_version",
+            "type": "string"
+          }
+        ],
+        "Values": [
+          [
+            "canvas_meta",
+            "data/canvas_meta.bejson",
+            1,
+            "1.0.0"
+          ],
+          [
+            "obj_square_001",
+            "data/obj_square_001.bejson",
+            1,
+            "1.0.0"
+          ],
+          [
+            "obj_circle_002",
+            "data/obj_circle_002.bejson",
+            1,
+            "1.0.0"
+          ],
+          [
+            "obj_square_003",
+            "data/obj_square_003.bejson",
+            1,
+            "1.0.0"
+          ]
+        ]
+      }
+    },
+    {
+      "path": "data/canvas_meta.bejson",
+      "content": {
+        "Format": "BEJSON",
+        "Format_Version": "104a",
+        "Format_Creator": "Elton Boehnen",
+        "Parent_Hierarchy": "../104a.mfdb.bejson",
+        "Records_Type": [
+          "canvas_meta"
+        ],
+        "Fields": [
+          {
+            "name": "db_name",
+            "type": "string"
+          },
+          {
+            "name": "behtml_lanes",
+            "type": "integer"
+          },
+          {
+            "name": "behtml_ry",
+            "type": "integer"
+          },
+          {
+            "name": "stage_width",
+            "type": "integer"
+          },
+          {
+            "name": "stage_height",
+            "type": "integer"
+          },
+          {
+            "name": "show_grid",
+            "type": "boolean"
+          },
+          {
+            "name": "next_id",
+            "type": "integer"
+          },
+          {
+            "name": "updated_at",
+            "type": "string"
+          }
+        ],
+        "Values": [
+          [
+            "golden",
+            8,
+            32,
+            1000,
+            600,
+            false,
+            4,
+            "<ts>"
+          ]
+        ]
+      }
+    },
+    {
+      "path": "data/obj_square_001.bejson",
+      "content": {
+        "Format": "BEJSON",
+        "Format_Version": "104a",
+        "Format_Creator": "Elton Boehnen",
+        "Parent_Hierarchy": "../104a.mfdb.bejson",
+        "Records_Type": [
+          "obj_square_001"
+        ],
+        "Fields": [
+          {
+            "name": "obj_uuid",
+            "type": "string"
+          },
+          {
+            "name": "obj_id",
+            "type": "integer"
+          },
+          {
+            "name": "obj_entity_name",
+            "type": "string"
+          },
+          {
+            "name": "obj_type",
+            "type": "string"
+          },
+          {
+            "name": "obj_label",
+            "type": "string"
+          },
+          {
+            "name": "pos_cx",
+            "type": "number"
+          },
+          {
+            "name": "pos_cy",
+            "type": "number"
+          },
+          {
+            "name": "pos_x",
+            "type": "number"
+          },
+          {
+            "name": "pos_y",
+            "type": "number"
+          },
+          {
+            "name": "dim_size",
+            "type": "number"
+          },
+          {
+            "name": "dim_width",
+            "type": "number"
+          },
+          {
+            "name": "dim_height",
+            "type": "number"
+          },
+          {
+            "name": "grid_lane",
+            "type": "integer"
+          },
+          {
+            "name": "grid_row",
+            "type": "integer"
+          },
+          {
+            "name": "z_index",
+            "type": "integer"
+          },
+          {
+            "name": "obj_updated_at",
+            "type": "string"
+          }
+        ],
+        "Values": [
+          [
+            "<uuid>",
+            1,
+            "obj_square_001",
+            "square",
+            "Square 1",
+            200,
+            200,
+            168,
+            168,
+            64,
+            64,
+            64,
+            1,
+            5,
+            2,
+            "<ts>"
+          ]
+        ]
+      }
+    },
+    {
+      "path": "data/obj_circle_002.bejson",
+      "content": {
+        "Format": "BEJSON",
+        "Format_Version": "104a",
+        "Format_Creator": "Elton Boehnen",
+        "Parent_Hierarchy": "../104a.mfdb.bejson",
+        "Records_Type": [
+          "obj_circle_002"
+        ],
+        "Fields": [
+          {
+            "name": "obj_uuid",
+            "type": "string"
+          },
+          {
+            "name": "obj_id",
+            "type": "integer"
+          },
+          {
+            "name": "obj_entity_name",
+            "type": "string"
+          },
+          {
+            "name": "obj_type",
+            "type": "string"
+          },
+          {
+            "name": "obj_label",
+            "type": "string"
+          },
+          {
+            "name": "pos_cx",
+            "type": "number"
+          },
+          {
+            "name": "pos_cy",
+            "type": "number"
+          },
+          {
+            "name": "pos_x",
+            "type": "number"
+          },
+          {
+            "name": "pos_y",
+            "type": "number"
+          },
+          {
+            "name": "dim_size",
+            "type": "number"
+          },
+          {
+            "name": "dim_width",
+            "type": "number"
+          },
+          {
+            "name": "dim_height",
+            "type": "number"
+          },
+          {
+            "name": "grid_lane",
+            "type": "integer"
+          },
+          {
+            "name": "grid_row",
+            "type": "integer"
+          },
+          {
+            "name": "z_index",
+            "type": "integer"
+          },
+          {
+            "name": "obj_updated_at",
+            "type": "string"
+          }
+        ],
+        "Values": [
+          [
+            "<uuid>",
+            2,
+            "obj_circle_002",
+            "circle",
+            "Circle 2",
+            400,
+            300,
+            352,
+            252,
+            96,
+            96,
+            96,
+            3,
+            7,
+            2,
+            "<ts>"
+          ]
+        ]
+      }
+    },
+    {
+      "path": "data/obj_square_003.bejson",
+      "content": {
+        "Format": "BEJSON",
+        "Format_Version": "104a",
+        "Format_Creator": "Elton Boehnen",
+        "Parent_Hierarchy": "../104a.mfdb.bejson",
+        "Records_Type": [
+          "obj_square_003"
+        ],
+        "Fields": [
+          {
+            "name": "obj_uuid",
+            "type": "string"
+          },
+          {
+            "name": "obj_id",
+            "type": "integer"
+          },
+          {
+            "name": "obj_entity_name",
+            "type": "string"
+          },
+          {
+            "name": "obj_type",
+            "type": "string"
+          },
+          {
+            "name": "obj_label",
+            "type": "string"
+          },
+          {
+            "name": "pos_cx",
+            "type": "number"
+          },
+          {
+            "name": "pos_cy",
+            "type": "number"
+          },
+          {
+            "name": "pos_x",
+            "type": "number"
+          },
+          {
+            "name": "pos_y",
+            "type": "number"
+          },
+          {
+            "name": "dim_size",
+            "type": "number"
+          },
+          {
+            "name": "dim_width",
+            "type": "number"
+          },
+          {
+            "name": "dim_height",
+            "type": "number"
+          },
+          {
+            "name": "grid_lane",
+            "type": "integer"
+          },
+          {
+            "name": "grid_row",
+            "type": "integer"
+          },
+          {
+            "name": "z_index",
+            "type": "integer"
+          },
+          {
+            "name": "obj_updated_at",
+            "type": "string"
+          }
+        ],
+        "Values": [
+          [
+            "<uuid>",
+            3,
+            "obj_square_003",
+            "square",
+            "Square 3",
+            410,
+            380,
+            378,
+            348,
+            64,
+            64,
+            64,
+            3,
+            10,
+            2,
+            "<ts>"
+          ]
+        ]
+      }
+    }
+  ]
+}

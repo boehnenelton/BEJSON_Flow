@@ -166,3 +166,8 @@ Every component must maintain single-responsibility modular isolation:
      - `prompt_template` (`string`: prompt with `{{variable}}` and `{{session.field}}` interpolation).
      - `response_schema_keys` (`string`: comma-separated structured output keys unpacked into the session & flow context).
      - `system_instruction` (`string`: role and output constraint instructions).
+
+## 7. Recorded User Exemption (2026-11-23)
+The owner granted an explicit, scoped exemption to the immutability law above: `lib/Canvas/` (canvas core and the Canvas
+family) may be modified, **gated behind `canvasMode` (0 default)**. `lib/Core/` (the Core family) remains frozen. All Canvas
+changes require golden-file parity for mode 0 (`lib/Canvas/tests/test_canvas_mode0_golden.js`).

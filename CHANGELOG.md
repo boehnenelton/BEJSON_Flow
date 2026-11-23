@@ -1,3 +1,17 @@
+# BEJSON_Flow 1.1.0 (PKG 111 -> PKG 112 · 2026-11-23)
+- Added `INSTRUCTIONS.md` (apply, verify, canvas_mode usage, remaining work). No code changes.
+
+# BEJSON_Flow 1.1.0 (PKG 110 -> PKG 111 · 2026-11-23)
+- lib_bejson_canvas_core.js 1.0.1 -> 1.1.0: added `canvasMode` gate (0 legacy | 1 scaled world | 2 paged 2x2), world/viewport split,
+  rectangle-aware collision, per-page 8-lane/Ry=32 quantization, `pageOf/pageLocal/pageBounds`, append-only `canvas_meta` fields
+  (`canvas_mode, world_width, world_height, page_cols, page_rows`, mode >= 1 only), `strictImport` SHA-256 verification,
+  import re-clamp, manifest 1.32 alignment. Mode 0 export is structurally identical to 1.0.1 (golden test).
+- Canvas_Flow: `createFlowStore({canvasMode,...})`, single stage source in modes >= 1, mode 2 Start/End in page (0,0),
+  `Canvas_Mode/World_Width/World_Height` export keys (mode >= 1 only), `flow_cli init --canvas-mode N`.
+- Tests: fixed stale `test_canvas_core.js`; added `test_canvas_mode0_golden.js`, `test_canvas_modes.js`, `test_canvas_flow_modes.js`.
+- Removed stale duplicate `lib/lib_bejson_canvas_core.js`; rewrote `dev/canvas_core_bugs.md`; recorded exemption in both AGENTS.md.
+- Not yet built: UI camera (zoom/pan), ghost-label overlay, page navigator/overview (plan phases 3-4).
+
 # BEJSON_Flow 1.1.0 (PKG 109 -> PKG 110 · 2026-11-22)
 - Redirection Gate Side Anchor & Branch Node Insertion:
   - Added interactive side anchor stub (`getRedirectSideAnchors()`, `.be-connector-line--redirect-stub`, and `.be-anchor-dot--redirect-branch`) extending from Redirection Gate nodes to represent an alternate branch that "goes nowhere until you add a node".
